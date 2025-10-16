@@ -1,1 +1,1 @@
-# AutoNotesAI
+# AutoNotes AI
