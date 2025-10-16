@@ -1,0 +1,5 @@
+{
+  "name": "AutoNotes Web App",
+  "description": "An interface to start, configure, and monitor an n8n workflow that processes lecture slides into Markdown notes for Obsidian. This app allows users to upload a PDF, configure different AI agents, and view the real-time progress of the note-generation process.",
+  "requestFramePermissions": []
+}
