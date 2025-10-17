@@ -1,0 +1,26 @@
+{
+  "name": "autonotes-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "cors": "^2.8.5",
+    "puppeteer": "^24.15.1",
+    "handlebars": "^4.7.8",
+    "marked": "^15.0.6",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^22.14.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.8.2"
+  }
+}
