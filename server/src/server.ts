@@ -51,10 +51,7 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 AutoNotes Server running on http://localhost:${PORT}`);
-  console.log(`📄 PDF Generation: http://localhost:${PORT}/api/pdf`);
-  console.log(`⚙️  Configuration: http://localhost:${PORT}/api/config`);
-  console.log(`💚 Health Check: http://localhost:${PORT}/health`);
+  console.log(`🚀 Server: http://localhost:${PORT}`);
 });
 
 export default app;
