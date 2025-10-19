@@ -2,7 +2,7 @@ import React from 'react';
 
 const LoadingSkeleton: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center p-6 min-h-[220px] overflow-hidden">
+    <div className="flex flex-col items-center justify-center p-6 h-full overflow-hidden">
       <div className="w-full max-w-md mx-auto">
         <div className="space-y-4 animate-pulse">
           <div className="h-3 bg-gray-700 rounded w-3/4"></div>

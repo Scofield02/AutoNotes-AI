@@ -41,49 +41,44 @@ const AgentConfig: React.FC<AgentConfigProps> = ({ savedModels, selectedModelId,
   return (
     <>
       <div className="mt-4 sm:mt-5">
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">Configure AI</h2>
-        <div className="bg-gray-900/50 rounded-lg border border-gray-700 p-3 sm:p-4 space-y-3 sm:space-y-4">
-          <div>
-            <label htmlFor="model-select" className="block text-xs sm:text-sm font-medium text-gray-300 mb-1">
-              AI Model Configuration
-            </label>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-              <select
-                id="model-select"
-                value={selectedModelId}
-                onChange={(e) => onModelChange(e.target.value)}
-                disabled={disabled || savedModels.length === 0}
-                className="flex-grow w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label="Select an AI model configuration"
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">AI Model Configuration</h2>
+        <div className="bg-gray-900/50 rounded-lg border border-gray-700 p-4 sm:p-5 space-y-3 sm:space-y-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <select
+              id="model-select"
+              value={selectedModelId}
+              onChange={(e) => onModelChange(e.target.value)}
+              disabled={disabled || savedModels.length === 0}
+              className="flex-grow w-full bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Select an AI model configuration"
+            >
+              {savedModels.length === 0 ? (
+                <option value="">Please add a model configuration</option>
+              ) : (
+                savedModels.map(model => (
+                  <option key={model.id} value={model.id}>{model.displayName}</option>
+                ))
+              )}
+            </select>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={handleOpenEditModal} 
+                disabled={disabled || !selectedModelId}
+                className="flex-1 sm:flex-none p-2 text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Edit selected configuration"
+                title="Edit selected configuration"
               >
-                {savedModels.length === 0 ? (
-                  <option value="">Please add a model configuration</option>
-                ) : (
-                  savedModels.map(model => (
-                    <option key={model.id} value={model.id}>{model.displayName}</option>
-                  ))
-                )}
-              </select>
-              <div className="flex items-center gap-2">
-                <button 
-                  onClick={handleOpenEditModal} 
-                  disabled={disabled || !selectedModelId}
-                  className="flex-1 sm:flex-none p-2 text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Edit selected configuration"
-                  title="Edit selected configuration"
-                >
-                  <PencilIcon className="w-5 h-5" />
-                </button>
-                <button 
-                  onClick={() => onDeleteModel(selectedModelId)}
-                  disabled={disabled || !selectedModelId}
-                  className="flex-1 sm:flex-none p-2 text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  aria-label="Delete selected configuration"
-                  title="Delete selected configuration"
-                >
-                  <TrashIcon className="w-5 h-5" />
-                </button>
-              </div>
+                <PencilIcon className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => onDeleteModel(selectedModelId)}
+                disabled={disabled || !selectedModelId}
+                className="flex-1 sm:flex-none p-2 text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Delete selected configuration"
+                title="Delete selected configuration"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
             </div>
           </div>
           

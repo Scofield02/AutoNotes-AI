@@ -58,11 +58,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ selectedFile, onFileSelect, dis
 
   if (selectedFile) {
     return (
-      <div className="mt-4 p-3 sm:p-4 bg-gray-700/50 border border-gray-600 rounded-lg flex items-center justify-between gap-2">
-        <p className="text-xs sm:text-sm text-cyan-300 font-medium truncate flex-1 min-w-0">{selectedFile.name}</p>
-        <button onClick={resetFile} disabled={disabled} className="text-gray-400 hover:text-white transition-colors disabled:opacity-50 flex-shrink-0">
-          <XCircleIcon className="w-5 h-5 sm:w-6 sm:h-6" />
-        </button>
+      <div className="mt-4">
+        <div className="relative flex flex-col items-center justify-center w-full h-28 sm:h-32 border-2 border-dashed border-gray-600 rounded-lg bg-gray-700/50">
+          <div className="w-full px-4 flex items-center justify-between gap-2">
+            <p className="text-xs sm:text-sm text-cyan-300 font-medium truncate flex-1 min-w-0">{selectedFile.name}</p>
+            <button onClick={resetFile} disabled={disabled} className="text-gray-400 hover:text-white transition-colors disabled:opacity-50 flex-shrink-0">
+              <XCircleIcon className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
+        </div>
       </div>
     )
   }
