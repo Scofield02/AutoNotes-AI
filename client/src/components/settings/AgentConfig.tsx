@@ -9,7 +9,7 @@ interface AgentConfigProps {
   savedModels: ModelConfig[];
   selectedModelId: string;
   onModelChange: (modelId: string) => void;
-  onSaveModel: (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => boolean;
+  onSaveModel: (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => Promise<boolean>;
   onDeleteModel: (modelId: string) => void;
   disabled: boolean;
 }
@@ -31,8 +31,8 @@ const AgentConfig: React.FC<AgentConfigProps> = ({ savedModels, selectedModelId,
     }
   };
   
-  const handleSave = (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => {
-    const success = onSaveModel(modelConfig);
+  const handleSave = async (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => {
+    const success = await onSaveModel(modelConfig);
     if (success) {
       setIsModalOpen(false);
     }
