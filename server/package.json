@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "init-db": "tsx src/database/init-db.ts"
   },
   "dependencies": {
     "express": "^4.21.2",
@@ -14,7 +15,9 @@
     "puppeteer": "^24.15.1",
     "handlebars": "^4.7.8",
     "marked": "^15.0.6",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "sqlite3": "^5.1.7",
+    "sqlite": "^5.1.1"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

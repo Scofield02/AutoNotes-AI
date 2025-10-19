@@ -29,10 +29,15 @@
       }
     </script>
     <style>
-      /* Prevent horizontal scroll */
-      html, body {
-        overflow-x: hidden;
+      /* Prevent horizontal scroll globally */
+      html, body, #root {
+        overflow-x: hidden !important;
         max-width: 100vw;
+      }
+      
+      body {
+        width: 100vw;
+        position: relative;
       }
       
       @keyframes gradient-animation {
@@ -43,7 +48,7 @@
       body {
         background: linear-gradient(-45deg, #0f172a, #1e293b, #083344, #1e293b);
         background-size: 400% 400%;
-        animation: gradient-animation 25s ease-infinite;
+        animation: gradient-animation 40s ease infinite;
       }
       .card-glow::before {
         content: '';

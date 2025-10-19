@@ -116,16 +116,16 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
           draggable={!disabled}
           onDragStart={(e) => handleDragStart(e, agent)}
           onDragEnd={handleDragEnd}
-          className={`group flex w-full items-center justify-between py-2.5 bg-gray-900/50 px-3 rounded-md border border-gray-700 transition-all duration-200 ${draggedAgentId === agent.id ? 'opacity-30 scale-105 shadow-lg' : 'opacity-100'} ${!disabled ? 'cursor-grab' : ''}`}
+          className={`group flex w-full items-center justify-between py-2.5 bg-gray-900/50 px-2 sm:px-3 rounded-md border border-gray-700 transition-all duration-200 ${draggedAgentId === agent.id ? 'opacity-30 scale-105 shadow-lg' : 'opacity-100'} ${!disabled ? 'cursor-grab' : ''}`}
         >
-          <div className="flex items-center">
-            <Bars3Icon className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" />
-            <div>
-              <h3 className="text-md font-medium text-gray-200">{agent.name}</h3>
-              <p className="text-xs text-gray-400 mt-1">{agent.description}</p>
+          <div className="flex items-center min-w-0 flex-1">
+            <Bars3Icon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 mr-2 sm:mr-3 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm sm:text-md font-medium text-gray-200 truncate">{agent.name}</h3>
+              <p className="text-xs text-gray-400 mt-1 line-clamp-2">{agent.description}</p>
             </div>
           </div>
-          <div className="flex items-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
               <button 
                   onClick={() => onEditAgent(agent)} 
                   disabled={disabled}
@@ -133,7 +133,7 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
                   aria-label={`Edit agent ${agent.name}`}
                   title="Edit Agent"
               >
-                  <PencilIcon className="w-5 h-5" />
+                  <PencilIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
               <button 
                   onClick={() => onDeleteAgent(agent.id)}
@@ -142,7 +142,7 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
                   aria-label={`Delete agent ${agent.name}`}
                   title="Delete Agent"
               >
-                  <TrashIcon className="w-5 h-5" />
+                  <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
           </div>
         </div>
@@ -161,22 +161,22 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
         <div>
-            <h2 className="text-xl font-semibold text-white">Configuration</h2>
-            <p className="mt-1 text-sm text-gray-400">
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Configuration</h2>
+            <p className="mt-1 text-xs sm:text-sm text-gray-400">
                 Configure your workflow by adding, removing, and reordering agents.
             </p>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-3 sm:space-y-4">
             <div>
-                <div className="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
-                    <h3 className="text-lg font-semibold text-cyan-300">Core Agents</h3>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 border-b border-gray-700 pb-2 gap-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-cyan-300">Core Agents</h3>
                     <button
                         onClick={() => onAddAgent('core')}
                         disabled={disabled}
-                        className="flex items-center px-2 py-1 text-xs font-medium text-cyan-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors disabled:opacity-50"
+                        className="flex items-center px-2 py-1 text-xs font-medium text-cyan-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors disabled:opacity-50 w-full sm:w-auto justify-center"
                     >
                        <PlusCircleIcon className="w-4 h-4 mr-1.5" />
                        Add Core Agent
@@ -191,19 +191,19 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
                     {coreAgents.length > 0 ? (
                         renderAgentList(coreAgents, 'core')
                     ) : (
-                        dropTarget?.list === 'core' ? <DropIndicator /> : <p className="text-sm text-gray-500 text-center py-4">Drag an optional agent here to start.</p>
+                        dropTarget?.list === 'core' ? <DropIndicator /> : <p className="text-xs sm:text-sm text-gray-500 text-center py-4">Drag an optional agent here to start.</p>
                     )}
                 </div>
                  <p className="mt-2 text-xs text-gray-500 text-center">Drag agents here to add them to the workflow. Drag to reorder.</p>
             </div>
 
             <div>
-                <div className="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
-                    <h3 className="text-lg font-semibold text-cyan-300">Optional Agents</h3>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 border-b border-gray-700 pb-2 gap-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-cyan-300">Optional Agents</h3>
                      <button
                         onClick={() => onAddAgent('optional')}
                         disabled={disabled}
-                        className="flex items-center px-2 py-1 text-xs font-medium text-cyan-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors disabled:opacity-50"
+                        className="flex items-center px-2 py-1 text-xs font-medium text-cyan-300 bg-gray-700/50 rounded-md hover:bg-gray-600/50 transition-colors disabled:opacity-50 w-full sm:w-auto justify-center"
                     >
                        <PlusCircleIcon className="w-4 h-4 mr-1.5" />
                        Add Optional Agent
@@ -217,24 +217,24 @@ const AgentSettings: React.FC<AgentSettingsProps> = ({
                     {optionalAgents.length > 0 ? (
                         renderAgentList(optionalAgents, 'optional')
                     ) : (
-                        dropTarget?.list === 'optional' ? <DropIndicator /> : <p className="text-sm text-gray-500 text-center py-4">No optional agents configured.</p>
+                        dropTarget?.list === 'optional' ? <DropIndicator /> : <p className="text-xs sm:text-sm text-gray-500 text-center py-4">No optional agents configured.</p>
                     )}
                 </div>
                  <p className="mt-2 text-xs text-gray-500 text-center">Drag agents from the workflow here to make them optional.</p>
             </div>
         </div>
         
-        <div className="pt-6 border-t border-gray-700/50 mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="pt-3 sm:pt-4 border-t border-gray-700/50 mt-3 sm:mt-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
             <button
                 onClick={onReset}
                 disabled={disabled}
-                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-800/80 rounded-md hover:bg-red-700/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-red-800/80 rounded-md hover:bg-red-700/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
             >
                 Reset all to Defaults
             </button>
             
             {isDirty && (
-                <div className="flex items-center space-x-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 order-1 sm:order-2">
                     <Button
                         onClick={onBack}
                         disabled={disabled}

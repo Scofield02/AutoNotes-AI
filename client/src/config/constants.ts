@@ -1,4 +1,4 @@
-import { AgentConfig } from './types';
+import { AgentConfig } from '../types';
 
 export const SYNTHESIZER_AGENT: AgentConfig = {
   id: 5,
