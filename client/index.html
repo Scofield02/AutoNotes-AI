@@ -29,10 +29,15 @@
       }
     </script>
     <style>
-      /* Prevent horizontal scroll */
-      html, body {
-        overflow-x: hidden;
+      /* Prevent horizontal scroll globally */
+      html, body, #root {
+        overflow-x: hidden !important;
         max-width: 100vw;
+      }
+      
+      body {
+        width: 100vw;
+        position: relative;
       }
       
       @keyframes gradient-animation {

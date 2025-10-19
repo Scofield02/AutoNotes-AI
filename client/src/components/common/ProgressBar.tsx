@@ -13,9 +13,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, currentTask, visibl
   
   return (
     <div className="w-full max-w-7xl mx-auto transition-opacity duration-300 px-2">
-      <div className="flex justify-between items-center mb-1 gap-2">
-        <p className="text-xs sm:text-sm font-medium text-cyan-300 truncate flex-1 min-w-0">{currentTask}</p>
-        <p className="text-xs sm:text-sm font-semibold text-gray-300 flex-shrink-0">{progress}%</p>
+      <div className="flex justify-end items-center mb-1">
+        <p className="text-xs sm:text-sm font-semibold text-gray-300">{progress}%</p>
       </div>
       <div className="w-full bg-gray-700/50 rounded-full h-1.5">
         <div 

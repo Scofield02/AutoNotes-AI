@@ -11,7 +11,7 @@ import { DocumentDuplicateIcon } from '../icons/DocumentDuplicateIcon';
 import { DocumentPlusIcon } from '../icons/DocumentPlusIcon';
 import { XCircleIcon } from '../icons/XCircleIcon';
 import PreviewModal from '../modals/PreviewModal';
-import WorkflowStepsList from './WorkflowStepsList';
+import CurrentAgentDisplay from './CurrentAgentDisplay';
 
 
 // This is loaded from a <script> tag in index.html
@@ -36,7 +36,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
   onStopWorkflow,
   onError,
 }) => {
-  const [viewMode, setViewMode] = useState<'code' | 'preview'>('code');
+  const [viewMode, setViewMode] = useState<'code' | 'preview'>('preview');
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [copyButtonText, setCopyButtonText] = useState('Copy');
   const [isExportingPDF, setIsExportingPDF] = useState(false);
@@ -143,14 +143,14 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   return (
     <>
-      <Card className="flex flex-col">
-        <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Monitor & Export</h2>
+      <Card className="flex flex-col h-[calc(100vh-12rem)]">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Monitor Workflow</h2>
         
-        <div className="space-y-3 sm:space-y-4 my-2">
-          <WorkflowStepsList steps={steps} />
+        <div className="mb-4 sm:mb-5">
+          <CurrentAgentDisplay steps={steps} isRunning={isRunning} />
         </div>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 mt-2 gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-3">
           <h3 className="text-base sm:text-lg font-semibold text-white">Processed Content</h3>
           <div className="flex items-center space-x-1 bg-gray-800/70 p-1 rounded-md w-full sm:w-auto">
             <button
@@ -168,19 +168,19 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
           </div>
         </div>
 
-        <div className="relative group mb-4 sm:mb-6">
-          <div className="relative bg-gray-900/50 rounded-lg border border-gray-700 shadow-inner overflow-hidden">
+        <div className="relative group mb-4 sm:mb-5 flex-1 min-h-0">
+          <div className="relative bg-gray-900/50 rounded-lg border border-gray-700 shadow-inner overflow-hidden h-full">
             {!markdownOutput && isRunning ? (
               <LoadingSkeleton />
             ) : !markdownOutput && !isRunning ? (
-              <div className="flex items-center justify-center min-h-[120px] text-gray-500 text-center p-4">
+              <div className="flex items-center justify-center h-full text-gray-500 text-center p-4">
                 The workflow has started. Processed content will appear here.
               </div>
             ) : viewMode === 'code' ? (
-              <pre className="whitespace-pre-wrap text-gray-300 font-mono text-xs sm:text-sm p-3 sm:p-4 overflow-y-auto max-h-[50vh]">{markdownOutput}</pre>
+              <pre className="whitespace-pre-wrap text-gray-300 font-mono text-xs sm:text-sm p-3 sm:p-4 overflow-y-auto h-full">{markdownOutput}</pre>
             ) : (
               <div 
-                className="markdown-preview p-3 sm:p-4 overflow-y-auto max-h-[50vh] text-sm sm:text-base"
+                className="markdown-preview p-3 sm:p-4 overflow-y-auto h-full text-sm sm:text-base"
                 dangerouslySetInnerHTML={{ __html: renderedHtml }}
               />
             )}
@@ -224,7 +224,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
                       onClick={handleExportPDF} 
                       variant="secondary"
                       disabled={isExportingPDF}
-                      className="w-full sm:w-auto bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                      className="w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
                       <DocumentArrowDownIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       {isExportingPDF ? 'Exporting...' : 'Export PDF'}
@@ -246,6 +246,7 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
         <PreviewModal 
           content={markdownOutput}
           onClose={() => setIsPreviewModalOpen(false)}
+          onError={onError}
         />
       )}
     </>

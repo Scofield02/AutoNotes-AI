@@ -603,16 +603,16 @@ const App: React.FC = () => {
   const isButtonDisabled = isRunning || !selectedFile || !extractedText || !selectedModelId || !selectedConfig?.apiKey;
 
   return (
-    <div className="bg-transparent text-white min-h-screen font-sans flex flex-col">
-       <div className="w-full px-4 sm:px-8 pt-4 pb-2">
+    <div className="bg-transparent text-white min-h-screen font-sans flex flex-col overflow-y-auto overflow-x-hidden">
+       <div className="w-full px-4 sm:px-8 pt-4 pb-2 flex-shrink-0">
             <ProgressBar
                 currentTask={currentTask}
                 progress={progress}
                 visible={currentView === 'monitor'}
             />
         </div>
-      <main className="relative flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-        <div className="relative w-full max-w-7xl mx-auto">
+      <main className="relative flex-1 container mx-auto px-4 sm:px-6 lg:px-8 pb-8 flex items-center overflow-x-hidden">
+        <div className="relative w-full max-w-7xl mx-auto my-auto">
           {/* Configuration View */}
           <div
             className={`w-full transition-all duration-700 ease-in-out ${
