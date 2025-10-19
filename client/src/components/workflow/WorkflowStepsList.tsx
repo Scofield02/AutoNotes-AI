@@ -12,13 +12,13 @@ interface WorkflowStepsListProps {
 const getStatusIcon = (status: WorkflowStatusEnum) => {
   switch (status) {
     case WorkflowStatusEnum.Pending:
-      return <ClockIcon className="w-5 h-5 text-gray-500" />;
+      return <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />;
     case WorkflowStatusEnum.Running:
-      return <CogIcon className="w-5 h-5 text-cyan-400 animate-spin-slow" />;
+      return <CogIcon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 animate-spin-slow" />;
     case WorkflowStatusEnum.Success:
-      return <CheckCircleIcon className="w-5 h-5 text-green-400" />;
+      return <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />;
     case WorkflowStatusEnum.Error:
-      return <XCircleIcon className="w-5 h-5 text-red-400" />;
+      return <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />;
     default:
       return null;
   }
@@ -30,13 +30,13 @@ const WorkflowStepsList: React.FC<WorkflowStepsListProps> = ({ steps }) => {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {steps.map((step, index) => (
-        <div key={index} className="flex items-center space-x-3 text-sm">
+        <div key={index} className="flex items-center space-x-2 sm:space-x-3 text-xs sm:text-sm">
           <div className="flex-shrink-0">
             {getStatusIcon(step.status)}
           </div>
-          <p className={`
+          <p className={`truncate flex-1 min-w-0
             ${step.status === WorkflowStatusEnum.Running && 'text-cyan-300 font-semibold'}
             ${step.status === WorkflowStatusEnum.Success && 'text-gray-300'}
             ${step.status === WorkflowStatusEnum.Pending && 'text-gray-500'}

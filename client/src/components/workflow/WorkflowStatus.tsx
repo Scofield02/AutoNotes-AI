@@ -143,44 +143,44 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
 
   return (
     <>
-      <Card className="flex flex-col h-full">
-        <h2 className="text-xl font-semibold text-white mb-4">Monitor & Export</h2>
+      <Card className="flex flex-col">
+        <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Monitor & Export</h2>
         
-        <div className="space-y-4 my-2">
+        <div className="space-y-3 sm:space-y-4 my-2">
           <WorkflowStepsList steps={steps} />
         </div>
 
-        <div className="flex items-center justify-between mb-4 mt-2">
-          <h3 className="text-lg font-semibold text-white">Processed Content</h3>
-          <div className="flex items-center space-x-1 bg-gray-800/70 p-1 rounded-md">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 mt-2 gap-3">
+          <h3 className="text-base sm:text-lg font-semibold text-white">Processed Content</h3>
+          <div className="flex items-center space-x-1 bg-gray-800/70 p-1 rounded-md w-full sm:w-auto">
             <button
               onClick={() => setViewMode('code')}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'code' ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}
+              className={`flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'code' ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}
             >
               Code
             </button>
             <button
               onClick={() => setViewMode('preview')}
-              className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'preview' ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}
+              className={`flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'preview' ? 'bg-cyan-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}
             >
               Preview
             </button>
           </div>
         </div>
 
-        <div className="relative flex-grow flex flex-col min-h-0 group">
-          <div className="relative bg-gray-900/50 rounded-lg border border-gray-700 flex-grow overflow-hidden shadow-inner">
+        <div className="relative group mb-4 sm:mb-6">
+          <div className="relative bg-gray-900/50 rounded-lg border border-gray-700 shadow-inner overflow-hidden">
             {!markdownOutput && isRunning ? (
               <LoadingSkeleton />
             ) : !markdownOutput && !isRunning ? (
-              <div className="flex items-center justify-center h-full text-gray-500 text-center p-4">
+              <div className="flex items-center justify-center min-h-[120px] text-gray-500 text-center p-4">
                 The workflow has started. Processed content will appear here.
               </div>
             ) : viewMode === 'code' ? (
-              <pre className="whitespace-pre-wrap text-gray-300 font-mono text-sm p-4 overflow-y-auto h-full">{markdownOutput}</pre>
+              <pre className="whitespace-pre-wrap text-gray-300 font-mono text-xs sm:text-sm p-3 sm:p-4 overflow-y-auto max-h-[50vh]">{markdownOutput}</pre>
             ) : (
               <div 
-                className="markdown-preview p-4 overflow-y-auto h-full"
+                className="markdown-preview p-3 sm:p-4 overflow-y-auto max-h-[50vh] text-sm sm:text-base"
                 dangerouslySetInnerHTML={{ __html: renderedHtml }}
               />
             )}
@@ -194,48 +194,49 @@ const WorkflowStatus: React.FC<WorkflowStatusProps> = ({
                 aria-label="Expand Preview"
             >
                 <div className="flex flex-col items-center text-gray-200 pointer-events-none">
-                    <ArrowsPointingOutIcon className="w-10 h-10 mb-2" />
-                    <span className="font-semibold">Expand</span>
+                    <ArrowsPointingOutIcon className="w-8 h-8 sm:w-10 sm:h-10 mb-2" />
+                    <span className="font-semibold text-sm sm:text-base">Expand</span>
                 </div>
             </div>
           )}
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row justify-end gap-3 sm:items-stretch">
+        <div className="flex flex-col gap-2 sm:gap-3">
           {isRunning ? (
-            <Button onClick={onStopWorkflow} variant="secondary" className="bg-red-800/80 hover:bg-red-700/80">
-              <XCircleIcon className="w-5 h-5 mr-2" />
+            <Button onClick={onStopWorkflow} variant="secondary" className="bg-red-800/80 hover:bg-red-700/80 w-full text-sm sm:text-base">
+              <XCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Stop Workflow
             </Button>
           ) : (
             steps.length > 0 && (
-              <>
+              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                 {markdownOutput && (
                   <>
-                    <Button onClick={handleCopy} variant="secondary">
-                      <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
+                    <Button onClick={handleCopy} variant="secondary" className="w-full sm:w-auto text-sm sm:text-base">
+                      <DocumentDuplicateIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       {copyButtonText}
                     </Button>
-                    <Button onClick={handleDownloadMd} variant="secondary">
-                      <ArrowDownTrayIcon className="w-5 h-5 mr-2" />
+                    <Button onClick={handleDownloadMd} variant="secondary" className="w-full sm:w-auto text-sm sm:text-base">
+                      <ArrowDownTrayIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Download .MD
                     </Button>
                     <Button 
                       onClick={handleExportPDF} 
                       variant="secondary"
                       disabled={isExportingPDF}
-                      className="bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full sm:w-auto bg-blue-600/80 hover:bg-blue-500/80 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                     >
-                      <DocumentArrowDownIcon className="w-5 h-5 mr-2" />
+                      <DocumentArrowDownIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       {isExportingPDF ? 'Exporting...' : 'Export PDF'}
                     </Button>
                   </>
                 )}
-                <Button onClick={onReturnToConfig}>
-                  <DocumentPlusIcon className="w-5 h-5 mr-2" />
-                  {markdownOutput ? 'Process Another File' : 'Return to Configuration'}
+                <Button onClick={onReturnToConfig} className="w-full sm:w-auto text-sm sm:text-base">
+                  <DocumentPlusIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <span className="hidden sm:inline">{markdownOutput ? 'Process Another File' : 'Return to Configuration'}</span>
+                  <span className="sm:hidden">{markdownOutput ? 'New File' : 'Back'}</span>
                 </Button>
-              </>
+              </div>
             )
           )}
         </div>

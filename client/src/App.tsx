@@ -598,40 +598,42 @@ const App: React.FC = () => {
     setCurrentView('config');
   };
 
-  const isButtonDisabled = isRunning || !selectedFile || !extractedText || !selectedModelId;
+  // Check if the selected model has a valid API key
+  const selectedConfig = savedModels.find(m => m.id === selectedModelId);
+  const isButtonDisabled = isRunning || !selectedFile || !extractedText || !selectedModelId || !selectedConfig?.apiKey;
 
   return (
-    <div className="bg-transparent text-white min-h-screen font-sans flex flex-col overflow-x-hidden">
-       <div className="w-full px-4 sm:px-8 pt-4">
+    <div className="bg-transparent text-white min-h-screen font-sans flex flex-col">
+       <div className="w-full px-4 sm:px-8 pt-4 pb-2">
             <ProgressBar
                 currentTask={currentTask}
                 progress={progress}
                 visible={currentView === 'monitor'}
             />
         </div>
-      <main className="relative flex-grow flex items-center justify-center container mx-auto p-4 sm:p-8 overflow-y-auto overflow-x-hidden">
-        <div className="relative w-full max-w-7xl h-[85vh] overflow-x-hidden">
+      <main className="relative flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="relative w-full max-w-7xl mx-auto">
           {/* Configuration View */}
           <div
-            className={`absolute top-0 left-0 w-full h-full transition-all duration-700 ease-in-out ${
-              currentView === 'config' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full pointer-events-none'
+            className={`w-full transition-all duration-700 ease-in-out ${
+              currentView === 'config' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-full pointer-events-none absolute inset-0'
             }`}
           >
             <Card className="flex flex-col">
-                <h1 className="text-3xl font-bold tracking-tight sm:text-4xl title-shine">AutoNotes AI</h1>
-                <p className="mt-2 text-lg text-gray-400">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight title-shine">AutoNotes AI</h1>
+                <p className="mt-2 text-base sm:text-lg text-gray-400">
                     Process your slides, documents, and notes.
                 </p>
                 
-                <div className="mt-8 border-b border-gray-700">
-                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                <div className="mt-4 sm:mt-6 border-b border-gray-700">
+                    <nav className="-mb-px flex space-x-4 sm:space-x-6" aria-label="Tabs">
                         <button
                             onClick={() => setActiveTab('workflow')}
                             className={`${
                                 activeTab === 'workflow'
                                 ? 'border-cyan-400 text-cyan-300'
                                 : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
-                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                            } whitespace-nowrap py-2 sm:py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
                         >
                             Workflow
                         </button>
@@ -644,18 +646,18 @@ const App: React.FC = () => {
                                 activeTab === 'settings'
                                 ? 'border-cyan-400 text-cyan-300'
                                 : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
-                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+                            } whitespace-nowrap py-2 sm:py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
                         >
                             Configuration
                         </button>
                     </nav>
                 </div>
                 
-                <div className="pr-2">
+                <div className="overflow-x-hidden">
                     {activeTab === 'workflow' && (
                       <div id="workflow-panel">
-                        <div className="mt-8">
-                            <h2 className="text-xl font-semibold text-white mb-2">Upload File</h2>
+                        <div className="mt-4 sm:mt-5">
+                            <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">Upload File</h2>
                             <FileUpload selectedFile={selectedFile} onFileSelect={handleFileSelect} disabled={isRunning} />
                             {!isRunning && currentTask && !extractedText && <p className="text-sm text-red-400 mt-2">{currentTask}</p>}
                         </div>
@@ -672,7 +674,7 @@ const App: React.FC = () => {
                     )}
                     
                     {activeTab === 'settings' && (
-                        <div id="settings-panel" className="mt-6">
+                        <div id="settings-panel" className="mt-3 sm:mt-4">
                             <AgentSettings
                                 agents={draftAgents}
                                 savedAgents={allAgents}
@@ -689,11 +691,11 @@ const App: React.FC = () => {
                     )}
                 </div>
 
-                <div className="pt-8 border-t border-gray-800">
+                <div className="pt-4 sm:pt-5 mt-4 sm:mt-5 border-t border-gray-800">
                     <Button 
                         onClick={runWorkflow}
                         disabled={isButtonDisabled}
-                        className="w-full text-lg"
+                        className="w-full text-base sm:text-lg py-3"
                     >
                         {isRunning ? (
                             <>
@@ -708,8 +710,8 @@ const App: React.FC = () => {
 
           {/* Monitor View */}
           <div
-            className={`absolute top-0 left-0 w-full h-full transition-all duration-700 ease-in-out ${
-              currentView === 'monitor' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
+            className={`w-full transition-all duration-700 ease-in-out ${
+              currentView === 'monitor' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none absolute inset-0'
             }`}
           >
             <WorkflowStatus 
