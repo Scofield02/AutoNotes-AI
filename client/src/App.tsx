@@ -12,7 +12,7 @@ import FileUpload from './components/sections/FileUpload';
 import AgentConfig from './components/settings/AgentConfig';
 import AgentSettings from './components/settings/AgentSettings';
 import WorkflowStatus from './components/workflow/WorkflowStatus';
-import { INITIAL_AGENTS, SYNTHESIZER_AGENT } from './config/constants';
+import { configService } from './services/configService';
 import { AppError, ErrorHandlingService } from './services/errorHandlingService';
 import { AgentConfig as AgentConfigType, ModelConfig, WorkflowStatusEnum, WorkflowStep } from './types';
 import { chunkText } from './utils/textChunker';
@@ -63,90 +63,64 @@ const App: React.FC = () => {
   // Cancellation management
   const isCancelledRef = useRef(false);
 
-  // Load models and agent settings from localStorage on initial render
+  // Load models and agent settings from database on initial render
   useEffect(() => {
-    // Load models
-    try {
-      const storedModels = localStorage.getItem('savedAiModels');
-      if (storedModels) {
-        const parsedModels: ModelConfig[] = JSON.parse(storedModels);
-        if (parsedModels.length > 0 && parsedModels[0].id && parsedModels[0].provider) {
-          setSavedModels(parsedModels);
-          if (parsedModels.length > 0) {
-            setSelectedModelId(parsedModels[0].id);
-          }
+    const loadConfigurationsFromDB = async () => {
+      try {
+        // Load models from database
+        const models = await configService.getAllModels();
+        if (models.length > 0) {
+          setSavedModels(models);
+          setSelectedModelId(models[0].id);
         }
+      } catch (error) {
+        console.error("Failed to load models from database", error);
       }
-    } catch (error) {
-      console.error("Failed to load models from localStorage", error);
-    }
-    
-    // Load agent settings
-    try {
-      const storedAgents = localStorage.getItem('savedAgentSettings');
-      let loadedAgents: AgentConfigType[];
-      if (storedAgents) {
-        let parsedAgents: AgentConfigType[] = JSON.parse(storedAgents);
-        
-        // Backwards compatibility migration for missing properties
-        const agentsWithAllProps = parsedAgents.map(agent => {
-            let migratedAgent = { ...agent };
-            if (!migratedAgent.type) {
-              migratedAgent.type = migratedAgent.id >= 5 ? 'optional' : 'core';
-            }
-            if (!migratedAgent.description) {
-                migratedAgent.description = `Default description for ${migratedAgent.name}.`;
-            }
-            return migratedAgent as AgentConfigType;
-        });
 
-        if (agentsWithAllProps.length > 0 && agentsWithAllProps[0].id && agentsWithAllProps[0].name) {
-          loadedAgents = agentsWithAllProps;
-        } else {
-          throw new Error("Invalid agent settings format in localStorage");
+      try {
+        // Load agents from database
+        const agents = await configService.getAllAgents();
+        if (agents.length > 0) {
+          setAllAgents(agents);
+          setDraftAgents(agents);
         }
-      } else {
-        loadedAgents = [...INITIAL_AGENTS, SYNTHESIZER_AGENT];
+      } catch (error) {
+        console.error("Failed to load agents from database", error);
       }
-      setAllAgents(loadedAgents);
-      setDraftAgents(loadedAgents); // Initialize draft state
-    } catch (error) {
-       console.error("Failed to load agent settings, using defaults.", error);
-       const defaultAgents = [...INITIAL_AGENTS, SYNTHESIZER_AGENT];
-       setAllAgents(defaultAgents);
-       setDraftAgents(defaultAgents); // Initialize draft state with defaults
-    }
+    };
+
+    loadConfigurationsFromDB();
   }, []);
 
-  const handleSaveModel = (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => {
+  const handleSaveModel = async (modelConfig: Omit<ModelConfig, 'id'> & { id?: string }) => {
     // Check for duplicate display names, excluding the current model being edited
     if (savedModels.some(m => m.displayName === modelConfig.displayName && m.id !== modelConfig.id)) {
       alert("A model configuration with this name already exists.");
       return false; // Indicate failure
     }
 
-    let newModels: ModelConfig[];
-    let newSelectedModelId = selectedModelId;
-
-    if (modelConfig.id) { // Editing existing model
-      newModels = savedModels.map(m => m.id === modelConfig.id ? { ...m, ...modelConfig } : m);
-    } else { // Adding new model
-      const newModel: ModelConfig = {
-        ...modelConfig,
-        id: `model-${Date.now()}`
-      };
-      newModels = [...savedModels, newModel];
-      newSelectedModelId = newModel.id; // Auto-select the new model
-    }
-    
-    setSavedModels(newModels);
-    setSelectedModelId(newSelectedModelId);
     try {
-      localStorage.setItem('savedAiModels', JSON.stringify(newModels));
+      let savedModel: ModelConfig;
+      
+      if (modelConfig.id) { 
+        // Editing existing model
+        savedModel = await configService.updateModel(modelConfig.id, modelConfig);
+        const newModels = savedModels.map(m => m.id === savedModel.id ? savedModel : m);
+        setSavedModels(newModels);
+      } else { 
+        // Adding new model
+        savedModel = await configService.createModel(modelConfig);
+        const newModels = [...savedModels, savedModel];
+        setSavedModels(newModels);
+        setSelectedModelId(savedModel.id); // Auto-select the new model
+      }
+      
+      return true; // Indicate success
     } catch (error) {
-      console.error("Failed to save models to localStorage", error);
+      console.error("Failed to save model to database", error);
+      alert("Failed to save model configuration");
+      return false;
     }
-    return true; // Indicate success
   };
   
   const handleOpenDeleteModal = (modelId: string) => {
@@ -157,32 +131,41 @@ const App: React.FC = () => {
     }
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (!modelToDelete) return;
 
-    const newModels = savedModels.filter(m => m.id !== modelToDelete.id);
-    setSavedModels(newModels);
-    
-    if (selectedModelId === modelToDelete.id) {
-      setSelectedModelId(newModels.length > 0 ? newModels[0].id : '');
-    }
-    
     try {
-      localStorage.setItem('savedAiModels', JSON.stringify(newModels));
-    } catch (error) {
-      console.error("Failed to update models in localStorage after deletion", error);
-    }
+      await configService.deleteModel(modelToDelete.id);
+      
+      const newModels = savedModels.filter(m => m.id !== modelToDelete.id);
+      setSavedModels(newModels);
+      
+      if (selectedModelId === modelToDelete.id) {
+        setSelectedModelId(newModels.length > 0 ? newModels[0].id : '');
+      }
 
-    setIsDeleteModalOpen(false);
-    setModelToDelete(null);
+      setIsDeleteModalOpen(false);
+      setModelToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete model from database", error);
+      alert("Failed to delete model configuration");
+    }
   };
 
-  const handleSaveAgentSettings = () => {
-    setAllAgents(draftAgents);
-     try {
-      localStorage.setItem('savedAgentSettings', JSON.stringify(draftAgents));
+  const handleSaveAgentSettings = async () => {
+    try {
+      // Update all modified agents in the database
+      for (const draftAgent of draftAgents) {
+        const originalAgent = allAgents.find(a => a.id === draftAgent.id);
+        if (JSON.stringify(originalAgent) !== JSON.stringify(draftAgent)) {
+          await configService.updateAgent(draftAgent.id, draftAgent);
+        }
+      }
+      
+      setAllAgents(draftAgents);
     } catch (error) {
-      console.error("Failed to save agent settings to localStorage", error);
+      console.error("Failed to save agent settings to database", error);
+      alert("Failed to save agent settings");
     }
   };
 
@@ -195,10 +178,16 @@ const App: React.FC = () => {
     setIsResetModalOpen(true);
   };
 
-  const handleConfirmResetAgents = () => {
-    const defaultAgents = [...INITIAL_AGENTS, SYNTHESIZER_AGENT];
-    setDraftAgents(defaultAgents); // Reset the draft state
-    setIsResetModalOpen(false);
+  const handleConfirmResetAgents = async () => {
+    try {
+      const resetAgents = await configService.resetAgentsToDefaults();
+      setDraftAgents(resetAgents);
+      setAllAgents(resetAgents);
+      setIsResetModalOpen(false);
+    } catch (error) {
+      console.error("Failed to reset agents to defaults", error);
+      alert("Failed to reset agents to default configuration");
+    }
   };
 
   const handleOpenAddAgentModal = (type: 'core' | 'optional') => {
@@ -212,20 +201,30 @@ const App: React.FC = () => {
     setIsAgentModalOpen(true);
   };
   
-  const handleSaveAgent = (agentData: Omit<AgentConfigType, 'id' | 'type'> & { id?: number }) => {
-    let updatedAgents;
-    if (agentData.id) { // Editing existing agent
-      updatedAgents = draftAgents.map(a => a.id === agentData.id ? { ...a, ...agentData } as AgentConfigType : a);
-    } else { // Adding new agent
-      const newAgent: AgentConfigType = {
-        ...agentData,
-        id: Date.now(),
-        type: newAgentType
-      };
-      updatedAgents = [...draftAgents, newAgent];
+  const handleSaveAgent = async (agentData: Omit<AgentConfigType, 'id' | 'type'> & { id?: number }) => {
+    try {
+      let updatedAgents;
+      
+      if (agentData.id) { 
+        // Editing existing agent
+        const updatedAgent = await configService.updateAgent(agentData.id, agentData);
+        updatedAgents = draftAgents.map(a => a.id === updatedAgent.id ? updatedAgent : a);
+      } else { 
+        // Adding new agent (custom agent)
+        const newAgent: Omit<AgentConfigType, 'id'> = {
+          ...agentData,
+          type: newAgentType
+        };
+        const createdAgent = await configService.createAgent(newAgent);
+        updatedAgents = [...draftAgents, createdAgent];
+      }
+      
+      setDraftAgents(updatedAgents);
+      setIsAgentModalOpen(false);
+    } catch (error) {
+      console.error("Failed to save agent to database", error);
+      alert("Failed to save agent configuration");
     }
-    setDraftAgents(updatedAgents);
-    setIsAgentModalOpen(false);
   };
 
   const handleRequestDeleteAgent = (agentId: number) => {
@@ -236,7 +235,7 @@ const App: React.FC = () => {
     }
   };
 
-  const handleConfirmDeleteAgent = () => {
+  const handleConfirmDeleteAgent = async () => {
     if (!agentToDelete) return;
 
     // Prevent deleting the last core agent
@@ -247,11 +246,19 @@ const App: React.FC = () => {
         return;
     }
 
-    const updatedAgents = draftAgents.filter(a => a.id !== agentToDelete.id);
-    setDraftAgents(updatedAgents);
+    try {
+      await configService.deleteAgent(agentToDelete.id);
+      
+      const updatedAgents = draftAgents.filter(a => a.id !== agentToDelete.id);
+      setDraftAgents(updatedAgents);
+      setAllAgents(updatedAgents);
 
-    setIsAgentDeleteModalOpen(false);
-    setAgentToDelete(null);
+      setIsAgentDeleteModalOpen(false);
+      setAgentToDelete(null);
+    } catch (error) {
+      console.error("Failed to delete agent from database", error);
+      alert("Failed to delete agent configuration");
+    }
   };
 
   // Error handling functions
@@ -427,6 +434,12 @@ const App: React.FC = () => {
       alert('Please select a configured model with a valid API key.');
       return;
     }
+
+    // Validate API key format
+    if (selectedConfig.provider === 'google' && !selectedConfig.apiKey.trim()) {
+      alert('Invalid Google API key. Please check your configuration.');
+      return;
+    }
     
     isCancelledRef.current = false;
     setCurrentView('monitor');
@@ -469,69 +482,97 @@ const App: React.FC = () => {
         
         if (isCancelledRef.current) break;
 
-        if (selectedConfig.provider === 'google') {
-          const ai = new GoogleGenAI({ apiKey: selectedConfig.apiKey });
-          for (let j = 0; j < textChunks.length; j++) {
-            if (isCancelledRef.current) break;
-            setCurrentTask(`${agent.name} (chunk ${j + 1}/${textChunks.length})`);
-            const userPrompt = `Testo da elaborare:\n${textChunks[j]}`;
-            // FIX: Simplified the `contents` property for single-text prompts as per @google/genai SDK guidelines.
-            const response = await ai.models.generateContent({
-              model: selectedConfig.name,
-              contents: userPrompt,
-              config: {
-                systemInstruction: agent.systemInstruction,
-                temperature: agent.temperature,
-              }
-            });
-            processedText += response.text;
-          }
-        } else if (selectedConfig.provider === 'openrouter') {
-          const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
-          for (let j = 0; j < textChunks.length; j++) {
-            if (isCancelledRef.current) break;
-            setCurrentTask(`${agent.name} (chunk ${j + 1}/${textChunks.length})`);
-            const userPrompt = `Testo da elaborare:\n${textChunks[j]}`;
-            const response = await fetch(OPENROUTER_API_URL, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${selectedConfig.apiKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                model: selectedConfig.name,
-                messages: [
-                  { role: 'system', content: agent.systemInstruction },
-                  { role: 'user', content: userPrompt }
-                ],
-                temperature: agent.temperature,
-              })
-            });
-
-            if (!response.ok) {
-              const errorBody = await response.text();
-              console.error('OpenRouter API Error:', errorBody);
-              let errorMessage = `OpenRouter API error: ${response.status} ${response.statusText}`;
+        try {
+          if (selectedConfig.provider === 'google') {
+            const ai = new GoogleGenAI({ apiKey: selectedConfig.apiKey });
+            
+            for (let j = 0; j < textChunks.length; j++) {
+              if (isCancelledRef.current) break;
+              setCurrentTask(`${agent.name} (chunk ${j + 1}/${textChunks.length})`);
+              const userPrompt = `Testo da elaborare:\n${textChunks[j]}`;
+              
               try {
-                  const errorJson = JSON.parse(errorBody);
-                  if (errorJson.error && errorJson.error.message) {
-                      if (errorJson.error.message.includes("is not a valid model ID")) {
-                          errorMessage = `Invalid Model Name: "${selectedConfig.name}". Please use the Model ID from OpenRouter (e.g., 'openai/gpt-4o').`;
-                      } else {
-                          errorMessage = `OpenRouter Error: ${errorJson.error.message}`;
-                      }
-                  } else {
-                    errorMessage += ` - ${errorBody}`;
+                // FIX: Simplified the `contents` property for single-text prompts as per @google/genai SDK guidelines.
+                const response = await ai.models.generateContent({
+                  model: selectedConfig.name,
+                  contents: userPrompt,
+                  config: {
+                    systemInstruction: agent.systemInstruction,
+                    temperature: agent.temperature,
                   }
-              } catch (e) {
-                  errorMessage += ` - ${errorBody}`;
+                });
+                processedText += response.text;
+              } catch (apiError: any) {
+                console.error('Google API Error:', apiError);
+                
+                // Check for specific error types
+                if (apiError.message?.includes('API key')) {
+                  throw new Error('Invalid Google API key. Please check your configuration in Settings.');
+                } else if (apiError.message?.includes('quota')) {
+                  throw new Error('Google API quota exceeded. Please try again later or use a different API key.');
+                } else if (apiError.message?.includes('Failed to fetch')) {
+                  throw new Error('Network error: Unable to connect to Google API. Check your internet connection.');
+                } else {
+                  throw new Error(`Google API error: ${apiError.message || 'Unknown error'}`);
+                }
               }
-              throw new Error(errorMessage);
             }
+          } else if (selectedConfig.provider === 'openrouter') {
+            const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
+            for (let j = 0; j < textChunks.length; j++) {
+              if (isCancelledRef.current) break;
+              setCurrentTask(`${agent.name} (chunk ${j + 1}/${textChunks.length})`);
+              const userPrompt = `Testo da elaborare:\n${textChunks[j]}`;
+              
+              try {
+                const response = await fetch(OPENROUTER_API_URL, {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${selectedConfig.apiKey}`,
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    model: selectedConfig.name,
+                    messages: [
+                      { role: 'system', content: agent.systemInstruction },
+                      { role: 'user', content: userPrompt }
+                    ],
+                    temperature: agent.temperature,
+                  })
+                });
 
-            const data = await response.json();
-            processedText += data.choices[0].message.content;
+                if (!response.ok) {
+                  const errorBody = await response.text();
+                  console.error('OpenRouter API Error:', errorBody);
+                  let errorMessage = `OpenRouter API error: ${response.status} ${response.statusText}`;
+                  try {
+                      const errorJson = JSON.parse(errorBody);
+                      if (errorJson.error && errorJson.error.message) {
+                          if (errorJson.error.message.includes("is not a valid model ID")) {
+                              errorMessage = `Invalid Model Name: "${selectedConfig.name}". Please use the Model ID from OpenRouter (e.g., 'openai/gpt-4o').`;
+                          } else {
+                              errorMessage = `OpenRouter Error: ${errorJson.error.message}`;
+                          }
+                      } else {
+                        errorMessage += ` - ${errorBody}`;
+                      }
+                  } catch (e) {
+                      errorMessage += ` - ${errorBody}`;
+                  }
+                  throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                processedText += data.choices[0].message.content;
+              } catch (apiError: any) {
+                console.error('OpenRouter API Error:', apiError);
+                throw new Error(`OpenRouter API error: ${apiError.message || 'Unknown error'}`);
+              }
+            }
           }
+        } catch (stepError: any) {
+          // Re-throw the error to be caught by outer try-catch
+          throw stepError;
         }
         
         if (isCancelledRef.current) break;

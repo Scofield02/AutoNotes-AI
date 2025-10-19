@@ -54,6 +54,13 @@ coverage/
 # Puppeteer
 .local-chromium/
 
+# Database
+server/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
 # Editor directories and files
 *.suo
 *.ntvs*
