@@ -15,20 +15,15 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-
-# Copy source code
+# Copy everything
 COPY . .
 
-# Create data directory for SQLite
+# Install dependencies (will be compiled for Alpine Linux)
+RUN npm install
+
+# Create data directory
 RUN mkdir -p /app/data
 
-# Expose port
 EXPOSE 3001
 
-# Start dev server
 CMD ["npm", "run", "dev"]

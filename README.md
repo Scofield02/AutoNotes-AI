@@ -32,8 +32,9 @@ AutoNotes-AI/
 ### Prerequisites
 - Node.js 18+ 
 - npm or yarn
+- Docker & Docker Compose (optional)
 
-### Installation & Run
+### Option 1: Local Development
 
 ```bash
 # 1. Clone repository
@@ -44,10 +45,12 @@ cd AutoNotes-AI
 cd client && npm install
 cd ../server && npm install
 
-# 3. Initialize database (optional)
+# 3. Configure environment (server/.env)
 cd server
-npm run init-db
+cp .env.example .env
+# Add your API keys
 
+# 4. Start services
 # Terminal 1 - Backend (port 3001)
 cd server
 npm run dev
@@ -55,6 +58,25 @@ npm run dev
 # Terminal 2 - Frontend (port 3000)
 cd client
 npm run dev
+```
+
+### Option 2: Docker
+
+```bash
+# 1. Clone repository
+git clone <repo-url>
+cd AutoNotes-AI
+
+# 2. Configure environment
+cd server
+cp .env.example .env
+# Add your API keys
+
+# 3. Start with Docker Compose
+docker-compose up --build
+
+# Stop containers
+docker-compose down
 ```
 
 Open `http://localhost:3000` in your browser.
@@ -98,6 +120,22 @@ Database auto-initializes at `server/data/autonotes.db` on first server start.
 ## 📄 License
 
 MIT License - see LICENSE file for details
+
+## 📋 Changelog
+
+### v1.0.1
+- 🐳 **Docker Support** - Added Dockerfile and docker-compose for containerized deployment
+- 🔧 **Improved Configuration** - Simplified setup with `.dockerignore` files
+- 📦 **Persistent Storage** - Docker volume for database persistence
+- 🛠️ **Enhanced Stability** - Fixed native module compilation in containerized environments
+
+### v1.0.0
+- 🎉 Initial stable release
+- Multi-format document processing
+- AI multi-agent workflow system
+- SQLite database integration
+- Markdown and PDF export
+- Real-time workflow monitoring
 
 ---
 

@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    build: ./server
     container_name: autonotes-server
     ports:
       - "3001:3001"
@@ -13,24 +11,17 @@ services:
       - PORT=3001
       - CLIENT_URL=http://localhost:3000
     volumes:
-      - ./server:/app
-      - /app/node_modules
-      - ./server/data:/app/data
+      - server_data:/app/data
     networks:
       - autonotes-network
 
   client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
+    build: ./client
     container_name: autonotes-client
     ports:
       - "3000:3000"
     environment:
       - VITE_API_URL=http://localhost:3001
-    volumes:
-      - ./client:/app
-      - /app/node_modules
     depends_on:
       - server
     networks:
@@ -39,3 +30,6 @@ services:
 networks:
   autonotes-network:
     driver: bridge
+
+volumes:
+  server_data:
