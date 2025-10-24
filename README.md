@@ -123,19 +123,7 @@ MIT License - see LICENSE file for details
 
 ## 📋 Changelog
 
-### v1.0.1
-- 🐳 **Docker Support** - Added Dockerfile and docker-compose for containerized deployment
-- 🔧 **Improved Configuration** - Simplified setup with `.dockerignore` files
-- 📦 **Persistent Storage** - Docker volume for database persistence
-- 🛠️ **Enhanced Stability** - Fixed native module compilation in containerized environments
-
-### v1.0.0
-- 🎉 Initial stable release
-- Multi-format document processing
-- AI multi-agent workflow system
-- SQLite database integration
-- Markdown and PDF export
-- Real-time workflow monitoring
+See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ---
 
