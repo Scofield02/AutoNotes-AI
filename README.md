@@ -19,8 +19,6 @@ AutoNotes AI is a full-stack application that combines React frontend with Expre
 AutoNotes-AI/
 ├── client/          # React + TypeScript + Vite
 ├── server/          # Express + SQLite + Puppeteer
-├── SETUP.md         # Database setup guide
-├── API.md           # API documentation
 └── README.md        # This file
 ```
 
